@@ -1,0 +1,53 @@
+#ifndef checkerboard_h
+#define checkerboard_h
+#include <GL/glut.h>
+
+
+//CHECKERBOARD CLASS WHICH HAS GREEN AND WHITE SQUARES, EACH SQUARE IS 1 X 1 AND THE BOARD RESGTS ON THE XZ PLANE
+//COLORS
+GLfloat WHITE[] = {1, 1, 1}; //RGB: 255, 255, 255
+GLfloat GREEN[] = {0, 1, 0}; //RGB: 0, 255, 0
+
+class Checkerboard {
+  int displayListId;
+  int width;
+  int depth;
+public:
+  //CHECKERBOARD CONSTRUCTOR
+  Checkerboard(int width, int depth): width(width), depth(depth) {}
+  //TAKES THE WIDTH AND DIVIDES IT BY 2 FOR CENTER OF X
+  double centerx() {
+    return width / 2;
+} 
+  //TAKES THE DEPTH AND DIVIDES IT BY 2 FOR CENTER OF Z
+  double centerz() {
+    return depth / 2;
+}
+  //CREATE FUNCTION WHICH MAKES THE CHECKERBOARD
+  void create() {
+    displayListId = glGenLists(1); //GENERATE A CONTIGUOUS SET OF EMPTY DISPLAY LISTS
+    glNewList(displayListId, GL_COMPILE); //CREATE OR REPLACE A DISPLAY LIST
+    GLfloat lightPosition[] = {4, 3, 7, 1}; //POSITION FOR LIGHT
+    glLightfv(GL_LIGHT0, GL_POSITION, lightPosition); //LIGHT FOR BOARD
+    glBegin(GL_QUADS); //QUAD PRIMITIVES 
+    glNormal3d(0, 1, 0); //SETS CURRENT NORMAL VECTOR
+    //CREATE CHECKBOARD PATTERN
+    for (int x = 0; x < width - 1; x++) {
+      for (int z = 0; z < depth - 1; z++) {
+        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, (x + z) % 2 == 0 ? GREEN : WHITE);
+        glVertex3d(x, 0, z);
+        glVertex3d(x+1, 0, z);
+        glVertex3d(x+1, 0, z+1);
+        glVertex3d(x, 0, z+1);
+      }
+    }
+    glEnd();
+    glEndList();
+  }
+  //DRAWS CHECKERBOARD
+  void draw() {
+    glCallList(displayListId);
+  }
+};
+
+#endif /* checkerboard_h */
