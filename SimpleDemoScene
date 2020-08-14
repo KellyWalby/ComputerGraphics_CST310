@@ -1,0 +1,492 @@
+/*
+Project 8: Simple Demo Sceen
+Kelly Walby
+CST-310
+April 6, 2020
+*/
+
+#include <GL/glut.h>
+#include <cmath>
+
+// Colors
+GLfloat WHITE[] = {1, 1, 1}; //COLOR OF GROUND PLANE (EVENTUALLY)
+GLfloat BLUE[] = {0.2039, 0.5961, 0.8588};   //BLUE, RGB: 52, 152, 219
+GLfloat PURPLE[] = {0.6706,0.1255,0.9922}; //PURPLE, RGB: 171,32,253
+GLfloat PINK[] = {1, 0.4118, 0.7059}; //PINK, RGB: 255, 105, 180
+GLfloat GREEN[] = {0.298, 0.733, 0.0902}; //GREEN, RGB: 76, 187, 23
+GLfloat YELLOW[] = {1, 1, 0}; //YELLOW, RGB: 255, 255, 0
+GLfloat ORANGE[] = {1, 0.5294, 0.1725}; //ORANGE RGB: 255, 135, 44
+GLfloat RED[] = {0.9451, 0.1137, 0.1569}; //RED RGB: 241, 29, 40
+
+
+/*CREATES A CAMERA CLASS, IT MOVES HORIZONTALLY IN A CIRCLE CENTERTED AT THE ORIGIN OF OF A RADIUS OF 10 AND MOVES VERTICALLY UP AND DOWN*/
+class Camera {
+  double theta;  // DETERMINES THE X AND Z POSITION
+  double y;  // THE CURRENT Y POSITION 
+  double dTheta;  // INCREMENT IN THETA FOR SWINING THE CAMERA AROUND increment
+  double dy;  // INCREMENT IN Y FOR MOVING THE CAMERA UP/DOWN
+
+public:
+//CAMERA FUNCTION
+  Camera(): theta(0), y(3), dTheta(0.04), dy(0.2) {}
+
+//SETS X COORDINATE
+  double getX() {
+    return 10 * cos(theta);
+}
+
+//SETS Y COORDINATE
+  double getY() {
+    return y;
+} 
+
+//SETS Z COORDINATE
+  double getZ() {
+    return 10 * sin(theta);
+} 
+
+//MOVE RIGHT FUNCTION
+  void moveRight() {
+    theta += dTheta;
+}
+
+//MOVE LEFT FUNCTION 
+  void moveLeft() {
+    theta -= dTheta;
+}
+
+//MOVE UP FUNCTION
+  void moveUp() {
+    y += dy;
+}
+
+//MOVE DOWN FUNCTION
+  void moveDown() {if (y > dy) y -= dy;}
+};
+
+
+//A CUBE CLASS WITH A DIAMETER (SIZE OF CUBE), A COLOR, AND THEN A MAXIMUM HEIGHT FROM WHICH IS FALLS TO A SPECIFIC LEVEL DEPENDING ON WHICH ROW OF THE TRIANGLE IS IS ON. 
+class Cube {
+  double diameter; //CREATES SIZE OF CUBE (DIAMETER)
+  GLfloat* color; //COLOR OF CUBE
+  double maximumHeight; //MAXIMUM HEIGHT THE CUBES STARTS AT
+  double x; //COORDINATE X
+  double y; //COORDINATE Y
+  double z; //COORDINATE Z
+  int direction; //DIRECTION OF CUBE FALLING
+
+//CUBE CONSTRUCTOR  
+public:
+  Cube(double d, GLfloat* c, double h, double x, double z):
+      diameter(d), color(c), maximumHeight(h), direction(-1),
+      y(h), x(x), z(z) {}
+
+//FIRST ROW FUNCTION
+ void firstRow() {
+    y += direction * 0.02; //CHANGES THE RATE AT WHICH THE CUBES FALL
+    if (y > maximumHeight) { //NULL CONDITION THAT SETS THE CUBE AT THE RIGHT MAXMIMUM HEIGHT
+      y = maximumHeight; direction = -1;
+    }
+   else if (y < diameter) //TELLS THE CUBE TO FALL DOWN ALL THE WAY TO THE BOARD
+ {
+      y = diameter;
+  }
+    glPushMatrix(); //SAVES STATE
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color); //SPECIFIES MATERIAL PARAMETERS FOR LIGHTING MODEL
+    glTranslated(x, y, z); //TRANSLATES STATE
+    glutSolidCube(diameter); //CREATES THE CUBE
+    glPopMatrix(); //PUSHES SAVED STATE
+  }
+
+
+//SECOND ROW FUNCTION
+  void secondRow() {
+    y += direction * 0.02; //CHANGES THE RATE AT WHICH THE CUBES FALL
+    if (y > maximumHeight) { //NULL CONDITION THAT SETS THE CUBE AT THE RIGHT MAXMIMUM HEIGHT
+      y = maximumHeight; direction = -1;
+    }
+   else if (y < diameter + 0.4) //TELLS THE CUBE TO FALL DOWN TO HEIGHT OF 0.4 (ON TOP OF FIRST LEVEL CUBES)
+ {
+      y = diameter + 0.4; //SETS IT ON TOP OF FIRST LEVEL CUBES
+    }
+    glPushMatrix(); //SAVES STATE
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color); //SPECIFIES MATERIAL PARAMETERS FOR LIGHTING MODEL
+    glTranslated(x, y, z); //TRANSLATES STATE
+    glutSolidCube(diameter); //CREATES THE CUBE SIZE
+    glPopMatrix(); //PUSHES SAVED STATE
+  }
+
+//THIRD ROW FUNCTION
+  void thirdRow() {
+    y += direction * 0.02; //CHANGES THE RATE AT WHICH THE CUBES FALL
+    if (y > maximumHeight) //NULL CONDITION THAT SETS THE CUBE AT THE RIGHT MAXMIMUM HEIGHT
+{
+      y = maximumHeight; direction = -1;
+    }
+   else if (y < diameter + 0.8) { //TELLS THE CUBE TO FALL DOWN TO HEIGHT OF 0.8 (ON TOP OF SECOND LEVEL CUBES)
+      y = diameter + 0.8; //SETS IT ON TOP OF THE SECOND LEVEL CUBES
+    }
+    glPushMatrix(); //SAVES STATE
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color); //SPECIFIES MATERIAL PARAMETERS FOR LIGHTING MODEL
+    glTranslated(x, y, z); //TRANSLATES STATE
+    glutSolidCube(diameter); //CREATES THE CUBE SIZE
+    glPopMatrix(); //PUSHES SAVED STATE
+  }
+
+//FOURTH ROW FUNCTION
+ void fourthRow() {
+    y += direction * 0.02; //CHANGES THE RATE AT WHICH THE CUBES FALL
+    if (y > maximumHeight) { //NULL CONDITION THAT SETS THE CUBE AT THE RIGHT MAXMIMUM HEIGHT
+      y = maximumHeight; direction = -1;
+    }
+   else if (y < diameter + 1.2) { //TELLS THE CUBE TO FALL DOWN TO HEIGHT OF 1.2 (ON TOP OF THIRD LEVEL CUBES)
+      y = diameter + 1.2; //SETS IT ON TOP OF THE THIRD LEVEL CUBES
+    }
+    glPushMatrix(); //SAVES STATE
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color); //SPECIFIES MATERIAL PARAMETERS FOR LIGHTING MODEL
+    glTranslated(x, y, z); //TRANSLATES STATE
+    glutSolidCube(diameter); //CREATES THE CUBE SIZE
+    glPopMatrix(); //PUSHES SAVED STATE
+  }
+
+//FIFTH ROW FUNCTION
+ void fifthRow() {
+    y += direction * 0.02; //CHANGES THE RATE AT WHICH THE CUBES FALL
+    if (y > maximumHeight) { //NULL CONDITION THAT SETS THE CUBE AT THE RIGHT MAXMIMUM HEIGHT
+      y = maximumHeight; direction = -1;
+    }
+   else if (y < diameter + 1.6) {  //TELLS THE CUBE TO FALL DOWN TO HEIGHT OF 1.6 (ON TOP OF FOURTH LEVEL CUBES) 
+      y = diameter + 1.6; //SETS IT ON TOP OF THE FOURTH LEVEL CUBES
+    }
+    glPushMatrix(); //SAVES STATE
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color); //SPECIFIES MATERIAL PARAMETERS FOR LIGHTING MODEL
+    glTranslated(x, y, z); //TRANSLATES STATE
+    glutSolidCube(diameter); //CREATES THE CUBE SIZE
+    glPopMatrix(); //PUSHES SAVED STATE
+  }
+
+//SIXTH ROW FUNCTION
+ void sixthRow() {
+    y += direction * 0.02; //CHANGES THE RATE AT WHICH THE CUBES FALL
+    if (y > maximumHeight) { //NULL CONDITION THAT SETS THE CUBE AT THE RIGHT MAXMIMUM HEIGHT
+      y = maximumHeight; direction = -1;
+    }
+   else if (y < diameter + 2) { //TELLS THE CUBE TO FALL DOWN TO HEIGHT OF 2 (ON TOP OF FIFTH LEVEL CUBES)
+      y = diameter + 2; //SETS IT ON TOP OF THE FIFTH LEVEL CUBES
+    }
+    glPushMatrix(); //SAVES STATE
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color); //SPECIFIES MATERIAL PARAMETERS FOR LIGHTING MODEL
+    glTranslated(x, y, z); //TRANSLATES STATE
+    glutSolidCube(diameter); //CREATES THE CUBE SIZE
+    glPopMatrix(); //PUSHES SAVED STATE
+  }
+
+//SEVENTH ROW FUNCTION
+void seventhRow() {
+    y += direction * 0.02; //CHANGES THE RATE AT WHICH THE CUBES FALL
+    if (y > maximumHeight) {  //NULL CONDITION THAT SETS THE CUBE AT THE RIGHT MAXMIMUM HEIGHT
+      y = maximumHeight; direction = -1;
+    }
+   else if (y < diameter + 2.4) { //TELLS THE CUBE TO FALL DOWN TO HEIGHT OF 2.4 (ON TOP OF SIXTH LEVEL CUBES)
+      y = diameter + 2.4; //SETS IT ON TOP OF THE SIXTH LEVEL CUBES
+    }
+    glPushMatrix(); //SAVES STATE
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color); //SPECIFIES MATERIAL PARAMETERS FOR LIGHTING MODEL
+    glTranslated(x, y, z); //TRANSLATE STATE
+    glutSolidCube(diameter); //CREATES THE CUBE SIZE
+    glPopMatrix(); //PUSHES SAVED STATE
+  }
+ 
+};
+
+//TERRAIN CLASS (DERVIED FROM BOUNCING BALL CPP)
+class Terrain {
+  int displayListId;
+  int width; //WIDTH OF PLANE
+  int depth; //DEPTH OF PLANE
+public:
+//CONSTRUCTOR
+  Terrain(int width, int depth): width(width), depth(depth) {}
+  double centerx() {return width / 2;}
+  double centerz() {return depth / 2;}
+//FUNCTION TO CREATE TERRAIN
+  void create() {
+    displayListId = glGenLists(1);
+    glNewList(displayListId, GL_COMPILE);
+    glBegin(GL_QUADS); //USING GL QUAD PRIMITIVES
+    glNormal3d(0, 1, 0);
+    for (int x = 0; x < width - 1; x++) {
+      for (int z = 0; z < depth - 1; z++) {
+        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE,
+                     (x + z) % 2 == 0 ? WHITE : WHITE);
+        glVertex3d(x, 0, z);
+        glVertex3d(x+1, 0, z);
+        glVertex3d(x+1, 0, z+1);
+        glVertex3d(x, 0, z+1);
+      }
+    }
+    glEnd();
+    glEndList();
+  }
+//DRAW FUNCTION
+  void draw() {
+    glCallList(displayListId);
+  }
+};
+
+//GLOBAL VARIABLES TO CREATE TERRAIN AND CAMERA
+Terrain terrain(8, 8);
+Camera camera;
+
+//CREATES THE FIRST ROW OF CUBES WITH FUNCTION CUBE(DIAMETER, COLOR, Y, X, Z)
+//BACKGROUND TRIANGLE
+Cube pinkCubes[] = {
+  Cube(0.4, PINK, 13, 4, 5),
+  Cube(0.4, PINK, 11, 4, 4.5),
+  Cube(0.4, PINK, 10, 4, 4),
+  Cube(0.4, PINK, 18, 4, 3.5),
+  Cube(0.4, PINK, 6, 4, 3),
+  Cube(0.4, PINK, 9, 4, 2.5),
+  Cube(0.4, PINK, 16, 4, 2),
+  Cube(0.4, PINK, 20, 4, 1.5)
+};
+
+Cube purpleCubes[] = {
+  Cube(0.4, PURPLE, 17, 4, 4.75),
+  Cube(0.4, PURPLE, 15, 4, 4.25),
+  Cube(0.4, PURPLE, 21, 4, 3.75),
+  Cube(0.4, PURPLE, 25, 4, 3.25),
+  Cube(0.4, PURPLE, 12, 4, 2.75),
+  Cube(0.4, PURPLE, 18, 4, 2.25),
+  Cube(0.4, PURPLE, 22, 4, 1.75)
+};
+
+Cube blueCubes[] = {
+  Cube(0.4, BLUE, 25, 4, 4.5),
+  Cube(0.4, BLUE, 28, 4, 4),
+  Cube(0.4, BLUE, 30, 4, 3.5),
+  Cube(0.4, BLUE, 27, 4, 3),
+  Cube(0.4, BLUE, 23, 4, 2.5),
+  Cube(0.4, BLUE, 29, 4, 2)
+};
+
+Cube greenCubes[] = {
+  Cube(0.4, GREEN, 31, 4, 4.25),
+  Cube(0.4, GREEN, 33, 4, 3.75),
+  Cube(0.4, GREEN, 32, 4, 3.25),
+  Cube(0.4, GREEN, 30, 4, 2.75),
+  Cube(0.4, GREEN, 32, 4, 2.25)
+};
+
+Cube yellowCubes[] = {
+  Cube(0.4, YELLOW, 35, 4, 4),
+  Cube(0.4, YELLOW, 36, 4, 3.5),
+  Cube(0.4, YELLOW, 34, 4, 3),
+  Cube(0.4, YELLOW, 35, 4, 2.5)
+};
+
+Cube orangeCubes[] = {
+  Cube(0.4, ORANGE, 38, 4, 3.75),
+  Cube(0.4, ORANGE, 39, 4, 3.25),
+  Cube(0.4, ORANGE, 37, 4, 2.75)
+};
+
+Cube redCubes[] = {
+  Cube(0.4, RED, 41, 4, 3.5),
+  Cube(0.4, RED, 40, 4, 3)
+};
+
+//SECOND TRIANGLE
+Cube secondPinkCubes[] = {
+  Cube(0.4, PINK, 41, 4.5, 5),
+  Cube(0.4, PINK, 40, 4.5, 4.5),
+  Cube(0.4, PINK, 43, 4.5, 4),
+  Cube(0.4, PINK, 45, 4.5, 3.5),
+  Cube(0.4, PINK, 40, 4.5, 3),
+  Cube(0.4, PINK, 42, 4.5, 2.5),
+  Cube(0.4, PINK, 43.5, 4.5, 2),
+  Cube(0.4, PINK, 42, 4.5, 1.5)
+};
+
+Cube secondPurpleCubes[] = {
+  Cube(0.4, PURPLE, 43, 4.5, 4.75),
+  Cube(0.4, PURPLE, 49.5, 4.5, 4.25),
+  Cube(0.4, PURPLE, 47, 4.5, 3.75),
+  Cube(0.4, PURPLE, 49, 4.5, 3.25),
+  Cube(0.4, PURPLE, 44, 4.5, 2.75),
+  Cube(0.4, PURPLE, 47, 4.5, 2.25),
+  Cube(0.4, PURPLE, 45, 4.5, 1.75)
+};
+
+Cube secondBlueCubes[] = {
+  Cube(0.4, BLUE, 50, 4.5, 4.5),
+  Cube(0.4, BLUE, 53, 4.5, 4),
+  Cube(0.4, BLUE, 54.5, 4.5, 3.5),
+  Cube(0.4, BLUE, 51, 4.5, 3),
+  Cube(0.4, BLUE, 53, 4.5, 2.5),
+  Cube(0.4, BLUE, 52, 4.5, 2)
+};
+
+Cube secondGreenCubes[] = {
+  Cube(0.4, GREEN, 54, 4.5, 4.25),
+  Cube(0.4, GREEN, 56, 4.5, 3.75),
+  Cube(0.4, GREEN, 58.5, 4.5, 3.25),
+  Cube(0.4, GREEN, 57, 4.5, 2.75),
+  Cube(0.4, GREEN, 58, 4.5, 2.25)
+};
+
+Cube secondYellowCubes[] = {
+  Cube(0.4, YELLOW, 57, 4.5, 4),
+  Cube(0.4, YELLOW, 59, 4.5, 3.5),
+  Cube(0.4, YELLOW, 59, 4.5, 3),
+  Cube(0.4, YELLOW, 60, 4.5, 2.5)
+};
+
+Cube secondOrangeCubes[] = {
+  Cube(0.4, ORANGE, 60, 4.5, 3.75),
+  Cube(0.4, ORANGE, 61, 4.5, 3.25),
+  Cube(0.4, ORANGE, 63, 4.5, 2.75)
+};
+
+Cube secondRedCubes[] = {
+  Cube(0.4, RED, 63, 4.5, 3.5),
+  Cube(0.4, RED, 64, 4.5, 3)
+};
+
+
+//APPLICATION-SPECIFIC INITIALIZATION: SET UP GLOBAL LIGHTING PARAMETERS AND CREATE DISPLAY LISTS
+void init() {
+  glEnable(GL_DEPTH_TEST); //ENABLE DEPTH
+  glLightfv(GL_LIGHT0, GL_DIFFUSE, WHITE); //WHITE DIFFUSE LIGHTING
+  glLightfv(GL_LIGHT0, GL_SPECULAR, WHITE); //WHITE SPECULAR LIGHTING
+  glMaterialfv(GL_FRONT, GL_SPECULAR, WHITE); 
+  glMaterialf(GL_FRONT, GL_SHININESS, 30);
+  glEnable(GL_LIGHTING);
+  glEnable(GL_LIGHT0);
+  terrain.create(); //CREATE TERRIANS
+}
+
+//CREATES THE TERRAIN AND THEN THE CAMERA. IT ALSO TAKES EACH OF THE CUBES CREATED AND SETS THEM TO A LEVEL OF THE PYRAMID AT WHICH THEY WILL FALL TO.
+void display() {
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glLoadIdentity();
+  gluLookAt(camera.getX(), camera.getY(), camera.getZ(),
+            terrain.centerx(), 0.0, terrain.centerz(),
+            0.0, 1.0, 0.0);
+  terrain.draw();
+//FIRST TRIANGLE: FIRST ROW OF PINK CUBES
+  for (int i = 0; i < sizeof pinkCubes / sizeof(Cube); i++) //SIZEOF: QUERIES SIZE OF THE OBJECT
+{
+    pinkCubes[i].firstRow(); //TAKES EACH PINK CUBE AND SENDS THEM THROUGH THE FIRSTROW FUNCTION
+}
+
+//FIRST TRIANGLE: SECOND ROW OF PURPLE CUBES
+ for (int i = 0; i < sizeof purpleCubes / sizeof(Cube); i++) 
+{
+    purpleCubes[i].secondRow(); //TAKES EACH PURPLE CUBE AND SENDS THEM THROUGH THE SECONDROW FUNCTION 
+}
+
+//FIRST TRIANGLE: THIRD ROW OF BLUE CUBES
+ for (int i = 0; i < sizeof blueCubes / sizeof(Cube); i++) 
+{
+    blueCubes[i].thirdRow(); //TAKES EACH BLUE CUBE AND SENDS THEM THROUGH THE THIRDROW FUNCTION
+}
+
+//FIRST TRIANGLE: FOURTH ROW OF GREEN CUBES
+ for (int i = 0; i < sizeof greenCubes / sizeof(Cube); i++) 
+{
+    greenCubes[i].fourthRow(); //TAKES EACH GREEN CUBE AND SENDS THEM THROUGH THE FOURTHROW FUNCTION
+}
+
+//FIRST TRIANGLE: FIFTH ROW OF YELLOW CUBES
+ for (int i = 0; i < sizeof yellowCubes / sizeof(Cube); i++) 
+{
+    yellowCubes[i].fifthRow(); //TAKES EACH YELLOW CUBE AND SENDS THEM THROUGH THE FIFTHROW FUNCTION
+}
+
+//FIRST TRIANGLE: SIXTH ROW OF ORANGE CUBES
+ for (int i = 0; i < sizeof orangeCubes / sizeof(Cube); i++) 
+{
+    orangeCubes[i].sixthRow(); //TAKES EACH ORANGE CUBE AND SENDS THEM THROUGH THE SIXTHROW FUNCTION
+}
+
+//FIRST TRIANGLE: SEVENTH ROW OF RED CUBES
+ for (int i = 0; i < sizeof redCubes / sizeof(Cube); i++)
+ {
+    redCubes[i].seventhRow(); //TAKES EACH RED CUBE AND SENDS THEM THROUGH THE SEVENTHROW FUNCTION
+ }
+
+//SECOND TRIANGLE: FIRST ROW OF PINK CUBES
+ for (int i = 0; i < sizeof secondPinkCubes / sizeof(Cube); i++) 
+{
+    secondPinkCubes[i].firstRow(); //TAKES EACH SECOND PINK CUBE AND SENDS THEM THROUGH THE FIRSTROW FUNCTION
+}
+
+//SECOND TRIANGLE: SECOND ROW OF PURPLE CUBES
+  for (int i = 0; i < sizeof secondPurpleCubes / sizeof(Cube); i++) 
+{
+      secondPurpleCubes[i].secondRow(); //TAKES EACH SECOND PURPLE CUBE AND SENDS THEM THROUGH THE SECONDROW FUNCTION
+}
+
+//SECOND TRIANGLE: THIRD ROW OF BLUE CUBES
+  for (int i = 0; i < sizeof secondBlueCubes / sizeof(Cube); i++)
+{
+      secondBlueCubes[i].thirdRow(); //TAKES EACH SECOND BLUE CUBE AND SENDS THEM THROUGH THE THIRDROW FUNCTION
+}
+
+//SECOND TRIANGLE: FOURTH ROW OF GREEN CUBES
+  for (int i = 0; i < sizeof secondGreenCubes / sizeof(Cube); i++) 
+{
+      secondGreenCubes[i].fourthRow(); //TAKES EACH SECOND GREEN CUBE AND SENDS THEM THROUGH THE FOURTHROW FUNCTION
+}
+
+//SECOND TRIANGLE: FIFTH ROW OF YELLOW CUBES
+    for (int i = 0; i < sizeof secondYellowCubes / sizeof(Cube); i++)
+{
+      secondYellowCubes[i].fifthRow(); //TAKES EACH SECOND YELLOW CUBE AND SENDS THEM THROUGH THE FIFTHROW FUNCTION
+}
+
+//SECOND TRIANGLE: SIXTH ROW OF ORANGE CUBES
+    for (int i = 0; i < sizeof secondOrangeCubes / sizeof(Cube); i++) 
+{
+      secondOrangeCubes[i].sixthRow(); //TAKES EACH SECOND ORANGE CUBE AND SENDS THEM THROUGH THE SIXTHROW FUNCTION
+}
+
+//SECOND TRIANGLE: SEVENTH ROW OF RED CUBES
+    for (int i = 0; i < sizeof secondRedCubes / sizeof(Cube); i++) 
+{
+      secondRedCubes[i].seventhRow(); //TAKES EACH SECOND RED CUBE AND SENDS THEM THROUGH THE SEVENTHROW FUNCION
+}
+
+  glFlush();
+  glutSwapBuffers();
+}
+
+//RESHAPE FUNCTION THAT CONSTRUCTS A CAMERA TO PERFECTLY FIT IN THE WINDOW 
+void reshape(GLint w, GLint h) {
+  glViewport(0, 0, w, h);
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  gluPerspective(40.0, GLfloat(w) / GLfloat(h), 1.0, 150.0);
+  glMatrixMode(GL_MODELVIEW);
+}
+
+//TIMER FUNCTION THAT REQUESTS TO DRAW THE NEXT FRAME
+void timer(int v) {
+  glutPostRedisplay();
+  glutTimerFunc(1000/60, timer, v);
+}
+
+// Initializes GLUT and enters the main loop.
+int main(int argc, char** argv) {
+  glutInit(&argc, argv);
+  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH); //DISPLAY MODE FOR DOUBLE, COLOR AND 3D DEPTH
+  glutInitWindowPosition(80, 80); //WINDOW POSITION
+  glutInitWindowSize(800, 600); //WINDOW SIZE
+  glutCreateWindow("3D ANIMATED CUBE TRIANGLES");
+  glutDisplayFunc(display); //DISPLAY FUNCTION
+  glutReshapeFunc(reshape); //RESHAPE FUNCTION
+  glutTimerFunc(100, timer, 0); //TIME FUNCTION
+  init(); //INIT FUNCTION
+  glutMainLoop();
+}
