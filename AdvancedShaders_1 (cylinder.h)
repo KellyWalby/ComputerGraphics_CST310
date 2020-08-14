@@ -1,0 +1,31 @@
+#ifndef cylinder_h
+#define cylinder_h
+#include <GL/glut.h>
+#include <GL/glu.h>
+
+class Cylinder {
+  double radius; //DECLARES RADIUS VARIABLE
+  GLfloat* color; //DECLARES COLOR VARIABLE
+  double x; //DECLARES X VARIABLE
+  double y; //DECLARES Y VARIABLE
+  double z; //DECLARES Z VARIABLE
+public:
+  //CYLINDER CONSTRUCTOR W/ DECLARED VARIABLES AND PARAMETERS  
+  Cylinder(double r, GLfloat* c, double y, double x, double z):
+      radius(r), color(c), y(y), x(x), z(z) {
+ }
+ void update() {
+   GLUquadricObj *quadratic; //INITALIZES QUADTRATIC OBJECT
+   quadratic = gluNewQuadric(); //SETS IT EQUAL TO A NEW QUADRIC
+   glPushMatrix(); //PUSHES OBJECT INTO STACK
+   glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, color); //DECLARES MATERIAL FOR OBJECT
+   glTranslated(x, y, z); //TRANSLATES OBJECT
+   glRotatef(270,1,0,0); //ROTATES CYLINDER ONTO THE BOTTOM SIDE SO IT IS VERTICAL
+   gluCylinder(quadratic,radius,radius,1,15,15); //species quadics object,radius @ bottom,radius @ top,height, slices,stacks
+   glPushMatrix(); //PUSHES OBJECT INTO STACK
+   gluDisk(quadratic, 0, radius, 15, 4); //PUTS A DISK ON TOP OF CYLINDER 
+   glPopMatrix(); //POP STACK
+  }
+};
+
+#endif /* cylinder_h */
