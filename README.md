@@ -17,3 +17,8 @@ PoolRendering -- Original Photo & Rendered Photo
 
 
 <img width="381" alt="Picture1" src="https://user-images.githubusercontent.com/54555212/90274991-30adaa80-de27-11ea-835c-3c9c4d956ef5.png">
+
+Simple Demo Scene -- Loom Video Link: https://www.loom.com/share/3738a6c8f82a4aedb4b7207a2a908536
+
+<img width="468" alt="Picture" src="https://user-images.githubusercontent.com/54555212/90277267-e7f7f080-de2a-11ea-8711-590053b74fe8.png">
+
