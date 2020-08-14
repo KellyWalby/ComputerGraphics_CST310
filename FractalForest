@@ -1,0 +1,256 @@
+#include <GL/glut.h>
+#include <cmath>
+#include <iostream>
+#include <string>
+#include <fstream>
+#include <iomanip>
+#include <cstdlib>
+#include "turtle.h"
+
+using namespace std;
+
+float len; //LENGTH FOR EACH MOVEMENT
+int iter; //DEFINES HOW MANY TIMES THE GRAMMAR IS EXPANDED UPON
+double xRot; //X ROTATION
+double yRot; //Y ROTATION
+double zRot; //Z ROTATION
+string startSymbol; //THE STARTING SYMBOL FOR THE DESIGN
+string ruleChar; //THE CHARACTER THAT IS DEFINED FOR THE SYMBOL RULES
+string symbolRules; //STORES THE SYMBOL RULES FOR EACH ITERATION
+
+turtle myTurtle = turtle(); //ALLOWS TURTLE H FUNCTIONS TO BE USED
+
+// FOREST GREEN COLOR
+GLfloat GREEN[] = {0.133, 0.545, 0.133}; //RGB:34, 139, 34
+
+
+//FUNCTION TO OPEN FILE
+void loadFile(const char * fileName){
+    ifstream grammarFile; //OPEN FILE UNDER VARIABLE "grammarFile"
+    grammarFile.open(fileName); //OPENS SPECIFIC FILE
+    string rules;  //READS ONE LINE @ A TIME TO STORE IN STRING 'rules'
+    if (!grammarFile) //CHECKS IF THERE IS AN INPUT FILE AND IF NOT, EXITS PROGRAM
+    {
+        cout << "No input file found";
+        exit(1);
+    }
+    //STARTS READING THE FILE INFORMATION
+    getline(grammarFile, rules); //READS 1ST LINE
+    float fLen = rules.find(':'); //FINDS WHERE THE LENGTH IS WRITTEN
+    len = stoi(rules.substr(fLen + 1, rules.size())); //FINDS THE LENGTH IN THE FILE AND STORES IT IN "len"
+    rules.erase(); //CLEARS STRING "rules" TO READ NEXT LINE
+    
+    getline(grammarFile, rules); //READS 2ND LINE
+    float fIter = rules.find(':'); //FINDS WHERE THE # OF ITERATIONS IS WRITTEN
+    iter = stoi(rules.substr(fIter + 1, rules.size())); //FINDS THE # OF ITERATIONS IN THE GRAMMAR FILE AND STORES IT IN "iter"
+    rules.erase(); //CLEARS STRING "rules" TO READ NEXT LINE
+    
+    getline(grammarFile, rules); //READS 3RD LINE
+    float X_rot = rules.find(':'); //FINDS WHERE THE X ROTATION IS WRITTEN
+    xRot = stoi(rules.substr(X_rot + 1, rules.size())); //FINDS THE X ROTATION IN THE GRAMMAR FILE AND STORES IT IN "xRot"
+    rules.erase(); //CLEARS STRING "rules" TO READ NEXT LINE
+    
+    getline(grammarFile, rules); //READS 4TH LINE
+    float Y_rot = rules.find(':'); //FINDS WHERE THE Y ROTATION IS WRITTEN
+    yRot = stoi(rules.substr(Y_rot + 1, rules.size())); //FINDS THE Y ROTATION IN THE GRAMMAR FILE AND STORES IT IN "YRot"
+    rules.erase(); //CLEARS STRING "rules" TO READ NEXT LINE
+    
+    getline(grammarFile, rules); //READS 5TH LINE
+    float Z_rot = rules.find(':'); //FINDS WHERE THE Z ROTATION IS WRITTEN
+    zRot = stoi(rules.substr(Z_rot + 1, rules.size())); //FINDS THE Z ROTATION IN THE GRAMMAR FILE AND STORES IT IN "zRot"
+    rules.erase(); //CLEARS STRING "rules" TO READ NEXT LINE
+   
+    getline(grammarFile, rules); //READS 6TH LINE
+    float f_startSymbol = rules.find(":"); //FINDS THE ":" IN THE LINE
+    startSymbol = rules.substr(f_startSymbol + 2, rules.size()); //SUBTRACTS ":" AND 2 SPACES
+    ruleChar = rules.substr(f_startSymbol + 2, rules.size());
+    rules.erase(); //CLEARS STRING "rules" TO READ NEXT LINE
+    
+   
+    getline(grammarFile, rules); //READS 7TH LINE
+    //FINDS RULES
+    float f_symbolRules = rules.find(":"); //FINDS THE ":" IN THE LINE
+    symbolRules = rules.substr(f_symbolRules + 2, rules.size()); //SUBTRACTS ":" AND 2 SPACES
+    rules.erase(); //CLEARS STRING "rules" TO READ NEXT LINE
+}
+
+//maybe it isnt finding every F in the string and it is only replacing the first one?????
+//CREATE THE EXPANDED TURTLE STRING AFTER APPLYING RULES
+string newTurtleString(){
+    const string findStartSymbol(ruleChar); //REPLACE STARTSYMBOL WITH RULECHAR
+    string newGrammar; //CREATES NEW STRING WHICH WILL BE HOLDING APPLIED RULES
+    for (int i = 0; i < iter; i++) {
+        for (size_t pos = 0; (pos = startSymbol.find(findStartSymbol, pos)) != string::npos; pos += symbolRules.length())
+        {
+            newGrammar = startSymbol.replace(pos, startSymbol.length(), symbolRules);
+            
+        }
+        startSymbol = newGrammar;
+    }
+    return startSymbol;
+}
+
+
+void readGrammarFile()
+{
+    myTurtle.resetTurtlePos();//RESETS TURTLE POSITION
+    for (char c: newTurtleString())//READ THROUGH THE SYMBOLS THAT THE TURTLE STRING GENERATES PROVIDES
+{
+              //CASE F MOVES TURTLE FORWARD WHILE ALSO DRAWING A LINE
+              if (c == 'F') {
+                  myTurtle.drawOn(); //TURNS DRAWING ON
+                  myTurtle.moveForward(len); //MOVES FORWARD THE SPECIFIED LENGTH
+                  myTurtle.drawOff(); //TURNS DRAWING OFF
+              }
+              //CASE f MOVES FORWARD WITHOUT DRAWING ANY LINES
+              else if (c == 'f'){
+                  myTurtle.moveForward(len); //MOVES TURTLE FORWARD SPECIFIED LENGTH
+              }
+             //CASE + ROTATES TURTLE'S HEAD LEFT DIRECTION
+              else if (c == '+'){
+                  myTurtle.turnLeft(yRot); //TURN TURTLE LEFT
+              }
+              //CASE - ROTATES TURTLE'S HEAD IN RIGHT DIRECTION
+              else if (c == '-'){
+                  myTurtle.turnRight(yRot); //TURN TURTLE RIGHT
+              }
+              //SAVES POSITION OF TURTLE AT SPECIFIC POINT
+              else if (c == '['){ //SAVE CURRENT STATE OF TURTLE
+                  myTurtle.savePos();
+              }
+              //POPS BACK TO OLD TURTLE POSITION
+              else if(c == ']'){ //MOVE BACK TO LAST SAVED POSITON OF TURTLE
+                  myTurtle.visitOldPos();
+            }
+          }
+       }
+
+//CAMERA CLASS EXTRACTED FROM BOUNCING BALLS CPP
+//MOVES HORIZONTALLY IN A CIRCLE CENTERD AT THE ORIGIN OF RADIUS 10
+//IT MOVE VERTICALLY STRIAGHT UP AND DOWN
+class Camera {
+  double theta;      //DETERMINES X AND Z POSITIONS
+  double y;          //CURRENT Y POSITION
+  double dTheta;     //THETA INCREMENT FOR SWINGING CAMERA AROUND
+  double dy;         //INCREMENT IN Y FOR MOVING CAMERA UP/DOWN
+public:
+  Camera(): theta(0), y(3), dTheta(0.04), dy(0.2) {}
+  double getX() {return 10 * cos(theta);}
+  double getY() {return y;}
+  double getZ() {return 10 * sin(theta);}
+  void moveRight() {theta += dTheta;}
+  void moveLeft() {theta -= dTheta;}
+  void moveUp() {y += dy;}
+  void moveDown() {if (y > dy) y -= dy;}
+};
+
+
+class Checkerboard {
+  int displayListId;
+  int width;
+  int depth;
+public:
+  Checkerboard(int width, int depth): width(width), depth(depth) {}
+  double centerx() {return width / 2;}
+  double centerz() {return depth / 2;}
+  void create() {
+    displayListId = glGenLists(1);
+    glNewList(displayListId, GL_COMPILE);
+    GLfloat lightPosition[] = {4, 3, 7, 1};
+    glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
+    glBegin(GL_QUADS);
+    glNormal3d(0, 1, 0);
+    for (int x = 0; x < width - 1; x++) {
+      for (int z = 0; z < depth - 1; z++) {
+        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE,
+                     (x + z) % 2 == 0 ? GREEN : GREEN);
+        glVertex3d(x, 0, z);
+        glVertex3d(x+1, 0, z);
+        glVertex3d(x+1, 0, z+1);
+        glVertex3d(x, 0, z+1);
+      }
+    }
+    glEnd();
+    glEndList();
+  }
+
+  void draw() {
+    glCallList(displayListId);
+  }
+};
+
+// Global variables: a camera, and a checkerboard
+Checkerboard checkerboard(8, 8);
+Camera camera;
+
+
+// Application-specific initialization: Set up global lighting parameters
+// and create display lists.
+void init() {
+  glEnable(GL_DEPTH_TEST);
+  glLightfv(GL_LIGHT0, GL_DIFFUSE, GREEN);
+  glLightfv(GL_LIGHT0, GL_SPECULAR, GREEN);
+  glMaterialfv(GL_FRONT, GL_SPECULAR, GREEN);
+  glMaterialf(GL_FRONT, GL_SHININESS, 30);
+  glEnable(GL_LIGHTING);
+  glEnable(GL_LIGHT0);
+  checkerboard.create();
+}
+
+// Draws one frame, the checkerboard then the balls, from the current camera
+// position.
+void display() {
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glLoadIdentity();
+  gluLookAt(camera.getX(), camera.getY(), camera.getZ(),
+            checkerboard.centerx(), 0.0, checkerboard.centerz(),
+            0.0, 1.0, 0.0);
+  checkerboard.draw();
+  readGrammarFile();
+  glFlush();
+  glutSwapBuffers();
+}
+
+// On reshape, constructs a camera that perfectly fits the window.
+void reshape(GLint w, GLint h) {
+  glViewport(0, 0, w, h);
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  gluPerspective(40.0, GLfloat(w) / GLfloat(h), 1.0, 150.0);
+  glMatrixMode(GL_MODELVIEW);
+}
+
+// Requests to draw the next frame.
+void timer(int v) {
+  glutPostRedisplay();
+  glutTimerFunc(1000/60, timer, v);
+}
+
+// Moves the camera according to the key pressed, then ask to refresh the
+// display.
+void special(int key, int, int) {
+  switch (key) {
+    case GLUT_KEY_LEFT: camera.moveLeft(); break;
+    case GLUT_KEY_RIGHT: camera.moveRight(); break;
+    case GLUT_KEY_UP: camera.moveUp(); break;
+    case GLUT_KEY_DOWN: camera.moveDown(); break;
+  }
+  glutPostRedisplay();
+}
+
+// Initializes GLUT and enters the main loop.
+int main(int argc, char** argv) {
+  glutInit(&argc, argv);
+  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+  glutInitWindowPosition(80, 80);
+  glutInitWindowSize(800, 600);
+  glutCreateWindow("Fractal Art Project");
+  loadFile("/home/kelly/Downloads/lsys1.txt");
+  newTurtleString();
+  glutDisplayFunc(display);
+  glutReshapeFunc(reshape);
+  glutSpecialFunc(special);
+  glutTimerFunc(100, timer, 0);
+  init();
+  glutMainLoop();
+}
