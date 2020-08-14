@@ -1,0 +1,66 @@
+#ifdef __APPLE_CC__
+#include <GLUT/glut.h>
+#else
+#include <GL/glut.h>
+#endif
+#include <cstdlib>
+
+/*
+Kelly Walby
+2D Sierpinski Gasket
+CST-310
+January 12, 2020
+*/
+
+/*A 2D POINT CLASS USING X AND Y COORINDATES FOR POINTS AND DEFINING A MIDPOINT FUNCTION*/
+struct Point{
+  GLfloat x, y; //DEFINES X AND Y AS FLOAT
+  //SETTING X AND Y EQUAL TO 0
+  Point(GLfloat x = 0, GLfloat y = 0): x(x), y(y) {}
+  //THIS FUNCTION IS DEFINED TO FIND THE MIDPOINT (DIVIDING BY 2) OF EACH LINE DRAWN USING THE COORDINATES
+  Point midpoint(Point p){
+    return Point((x + p.x) / 2.0, (y + p.y) / 2.0);
+ }
+};
+
+////DRAWS THE SIERPINSKI GASKET
+void display() {
+
+  glClear(GL_COLOR_BUFFER_BIT);//CLEARS BUFFERS TO PRESET VALUES AND WITH 3D THE DEPTH BUFFER BIT IS INCLUDED
+
+  static Point vertices[] = {Point(0, 250), Point(120.5, 0), Point(250, 250)}; //SETS POSITION FOR EACH VERTEX
+
+//PLOTS 100,000 POINTS AND USES POINTS TO CONNECT TO RANDOM VERTCICES TO CREATE THE SIERPINSKI GASKET
+  static Point p = vertices[0];
+  glBegin(GL_POINTS); //DEFINES A GROUP OF VERTICES AND USING GL_POINTS TO CREATE INDIVIDUAL POINTS
+  for (int k = 0; k < 100000; k++) { //PLOTS 100,000 POINTS 
+    p = p.midpoint(vertices[rand() % 3]); //SETTING p  EQUAL TO THE MIDPOINT FUNCTION USING RANDOM VERTICES (3)
+    glVertex2f(p.x, p.y); //SETS X AND Y COORDINATES AND SETS Z COORDINATE TO 0
+  }
+  glEnd(); //ENDS THE LOOP
+  glFlush(); //EMPTIES ALL BUFFERS
+}
+
+//SETS COLORS AND ORTHOGRAPIC PROJECTION
+void init()
+{
+  glClearColor(1.000, 0.753, 0.796, 1.0); //SETS BACKGROUND TO BLUSH COLOR
+  glColor3f(0.118, 0.565, 1.000); //SETS TRIANGLE TO BLUE
+
+  //VIEWING VOLUME: 500 x 500 x 1 WINDOW WITH LOWER LEFT ORIGIN
+  glMatrixMode(GL_PROJECTION); //SETS CURRENT MATRIX AND APPLIES MATRIX OPERATIONS TO THE PROJECTION MATRIX
+  glLoadIdentity(); //REPLACES CURRENT MATRIX WITH IDENTITY MATRIX
+  glOrtho(0.0, 500.0, 0.0, 500.0, 0.0, 1.0); //VIEWING VOLUME
+}
+
+//MAIN TO RUN THE PROGRAM
+int main(int argc, char** argv) {
+  glutInit(&argc, argv); //INITILIZES TOOLKIT
+  glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB); //SETS DISPLAY MODE WITH SINGLE AND COLOR FOR 2D GASKET
+  glutInitWindowSize(500, 500); //WINDOW SIZE: 500 X 500
+  glutInitWindowPosition(40, 40); //WINDOW POSITION
+  glutCreateWindow("2D Sierpinski Triangle"); //WINDOW NAME
+  glutDisplayFunc(display); //CREATES 2D SIERPINSKI TRIANGLE
+  init(); //ADDITIONAL INILIZATIONS 
+  glutMainLoop(); //ENTERS LOOP
+}
