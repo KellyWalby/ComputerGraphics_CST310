@@ -10,3 +10,7 @@ This course utilized Ubuntu OS and OpenGL. The language used is C++ using the te
 
 
 ![Screenshot from 2020-01-12 23-23-18](https://user-images.githubusercontent.com/54555212/90271479-81220980-de21-11ea-8ad2-b6eb00fe92b3.png)
+
+PoolRendering -- Original Photo & Rendered Photo
+
+<img width="493" alt="Picture11" src="https://user-images.githubusercontent.com/54555212/90274834-e0364d00-de26-11ea-94c3-ab8763755890.png">
