@@ -1,5 +1,5 @@
 # ComputerGraphics_CST310
-This course utilized Ubuntu OS. The language used is C++ using the terminal to run the code for output. The course comprimised of mutiple diffferent projects expanding my knowledge in computer grpahcis. Each project's output can be viewed below as well as the command to run the code in Ubuntu terminal. 
+This course utilized Ubuntu OS. The language used is C++ using the terminal to run the code for output. The course compromised of mutiple diffferent projects expanding my knowledge in computer graphics. Each project's output can be viewed below. 
 
 2D_SierpinskiGasket
 
