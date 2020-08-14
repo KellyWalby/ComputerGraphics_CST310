@@ -22,3 +22,6 @@ Simple Demo Scene -- Loom Video Link: https://www.loom.com/share/3738a6c8f82a4ae
 
 <img width="468" alt="Picture" src="https://user-images.githubusercontent.com/54555212/90277267-e7f7f080-de2a-11ea-8711-590053b74fe8.png">
 
+AdvancedShaders_1 -- Loom Video Link: https://www.loom.com/share/b2943ca23c464d5ea607fba5c52b7668
+
+<img width="331" alt="Pic1" src="https://user-images.githubusercontent.com/54555212/90277782-cea37400-de2b-11ea-92c2-ac51fa45af7a.png">
