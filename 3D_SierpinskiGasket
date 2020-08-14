@@ -1,0 +1,68 @@
+#ifdef __APPLE_CC__
+#include <GLUT/glut.h>
+#else
+#include <GL/glut.h>
+#endif
+#include <cstdlib>
+
+/*
+Kelly Walby
+3D Sierpinski Gasket
+CST-310
+January 12, 2020
+*/
+
+struct Point { //3D POINT CLASS
+  GLfloat x, y, z; //DEFINES X, Y, AND X AS FLOAT 
+  //SETTING X, Y, AND Z EQUAL TO 0
+  Point(GLfloat x = 0, GLfloat y = 0, GLfloat z = 0): x(x), y(y), z(z) {} 
+  //THIS FUNCTION IS DEFINED TO FIND THE MIDPOINT (DIVIDING BY 2) OF EACH LINE DRAWN USING THE COORDINATES
+  Point midpoint(Point p) {
+    return Point ((x + p.x) / 2.0, (y + p.y) / 2.0, (z + p.z)/2.0);
+  }
+};
+
+//DRAWS THE SIERPINSKI GASKET
+void display() {
+
+  glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT); //CLEARS BUFFERS TO PRESET VALUES AND WITH 3D THE DEPTH BUFFER BIT IS INCLUDED
+
+  static Point vertices[] = {Point(0, 0, 0), Point(250, 500, 0), Point(400, 0, 0), Point(500, 250, 0)}; //SETS POSITION FOR EACH VERTEX
+
+
+//PLOTS 200,000 POINTS AND USES POINTS TO CONNECT TO RANDOM VERTCICES TO CREATE THE SIERPINSKI GASKET
+  static Point p = vertices[0];
+  glBegin(GL_POINTS); //DEFINES A GROUP OF VERTICES AND USING GL_POINTS TO CREATE INDIVIDUAL POINTS
+  for (int k = 0; k < 200000; k++){ //PLOTS 200,000 POINTS
+    p = p.midpoint(vertices[rand() % 4]); //USING MIDPOINT FUNCTION TO CONNECT POINTS TO VERTICES (4) CONTINUALLY
+    glVertex3f(p.x, p.y, p.z); //SUBMITS A VERTEX OF 3D 
+  }
+  glEnd(); //ENDS THE LOOP
+  glFlush(); //EMPTIES ALL BUFFERS
+}
+
+//SETS COLORS AND ORTHOGRAPIC PROJECTION
+void init()
+{
+  glClearColor(0.941, 0.973, 1.000, 1.0); //SETS BACKGROUND TO LIGHT BLUE
+  glColor3f(0.000, 0.749, 1.000); //SETS TRIANGLE TO BLUE
+  
+
+  //VIEWING VOLUME: 500 x 500 x 1 WINDOW WITH LOWER LEFT ORIGIN
+  glMatrixMode(GL_PROJECTION); //SETS CURRENT MATRIX AND APPLIES MATRIX OPERATIONS TO THE PROJECTION MATRIX
+  glLoadIdentity(); //REPLACES CURRENT MATRIX WITH IDENTITY MATRIX
+  glOrtho(0.0, 500.0, 0.0, 500.0, 0.0, 1.0); //VIEWING VOLUME
+}
+
+//MAIN TO RUN THE PROGRAM
+int main(int argc, char** argv) {
+  glutInit(&argc, argv); //INITILIZES TOOLKIT
+  glutInitDisplayMode (GLUT_SINGLE |GLUT_RGB|GLUT_DEPTH); //SETS DISPLAY MODE WITH SINGLE, COLOR AND DEPTH FOR 3D GASKET
+  glEnable(GL_DEPTH_TEST); //ENABLES DEPTH FOR Z COORDINATE 
+  glutInitWindowSize(500, 500); //WINDOW SIZE: 500 X 500
+  glutInitWindowPosition(40, 60); //WINDOW POSITION
+  glutCreateWindow("3D Sierpinski Triangle"); //NAME OF WINDOW
+  glutDisplayFunc(display); //CREATES 3D SIERPINSKI TRIANGLE USING FUNCTION DISPLAY
+  init(); //ADDITIONAL INITILIZATIONS 
+  glutMainLoop(); //ENTERS LOOP
+}
