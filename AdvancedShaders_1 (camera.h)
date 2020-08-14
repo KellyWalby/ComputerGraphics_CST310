@@ -1,0 +1,53 @@
+#ifndef camera_H
+#define camera_H
+
+#include <GL/glut.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+#include <vector>
+
+
+//CAMERA CLASS
+class Camera {
+  double theta;      //DETERMINES X AND Z POSITION
+  double y;          //THE CURRENT Y POSITONI
+  double dTheta;     //INCREMENT IN THETA FOR SWINGING THE CAMERA AROUND
+  double dy;         //INCREMENT IN Y FOR MOVING THE CAMERA UP/DOWN
+public:
+  //CAMERA CONSTRUCTOR
+  Camera(): theta(0), y(3), dTheta(0.04), dy(1.0) {}
+  //GETX FUNCTION TO SET THE X POSITION OF THE CAMERA
+  double getX() {
+    return 10 * cos(theta);
+}
+  //GETY FUNCTION TO SET THE Y POSITION OF THE CAMERA
+  double getY() {
+    return y;
+}
+
+  //GETZ FUNCTION TO SET THE Z POSITION OF THE CAMERA
+  double getZ() {
+    return 10 * sin(theta);
+}
+
+  //MOVERIGHT FUNCTION TO MOVE THE CAMERA TO THE RIGHT
+  void moveRight() {
+    theta -= dTheta;
+}
+  //MOVELEFT FUNCTION TO MOVE THE CAMERA TO THE LEFT
+  void moveLeft() {
+   theta += dTheta;
+}
+  //MOVEUP FUNCTION TO MOVE THE CAMERA UPWARDS
+  void moveUp() {
+    y += dy;
+}
+  //MOVEDOWN FUNCTION TO MOVE THE CAMERA DOWNWARDS
+  void moveDown() {
+    y -= dy;
+}
+};
+
+
+#endif /* camera_h */
