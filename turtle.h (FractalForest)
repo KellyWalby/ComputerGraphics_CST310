@@ -1,0 +1,142 @@
+#ifndef turtle_h
+#define turtle_h
+#define PI 3.14159265359
+#include <iostream>
+#include <string>
+#include <vector>
+#include <GL/glut.h>
+#include <math.h>
+
+using namespace std;
+
+int setX = 0; //INITILIZIES X TO 0
+int setY = 0; //INITILIZIES Y TO 0
+
+//CLASS TURTLE WHICH INCLUDES CURRENT COORDINATES, DRAWING STATE, AND FUCNTIONS TO DRAW/CHANGE DIRECTION
+class turtle {
+private:
+    float xCoord; //X COORDINATE
+    float yCoord; //Y COORDINATE
+    float zCoord; //Z COORDINATE
+    float theta; //CW DIRECTION OF TURTLE
+    float thetaZ; //CCW DIRECTION
+    bool draw; //TO KNOW IF THE TURTLE IS DRAWING OR NOT
+
+public:
+    //CONSTRUCTOR
+    turtle(){
+        resetTurtlePos(); //RESETS THE TURTLE'S POSITION
+    }
+    
+    void resetTurtlePos(){
+        xCoord = 0.0; //SETS X COORDINATE TO 0
+        yCoord = 0.0; //SETS Y COORDINATE TO 0
+        zCoord = 0.0; //SETS Z COORDINATE TO 0
+        theta = 0.0;  //SETS CW DIRECTION TO 0
+        draw = true; //SETS DRAW TO TRUE
+    }
+    
+    void changeVal(float xVal, float yVal, float zVal, float thetaVal, float thetaZVal, bool drawState){
+        xCoord = xVal; //SETS X COORDINATE TO "xVal"
+        yCoord = yVal; //SETS Y COORDINATE TO "yVal"
+        zCoord = zVal; //SETS Z COORDINATE TO "zVal"
+        theta = thetaVal; //SETS THETA DIRECTION TO "thetaVal"
+        thetaZ = thetaZVal; //SETS THETAZ DIRECTION TO "thetaZVal"
+        draw = drawState; //SETS DRAW TO "drawState"
+    }
+    
+    //FUNCTION TO UPDATE THE POSITION OF THE TURTLE
+    void newPosition(const float new_xCoord, const float new_yCoord, const float new_zCoord){
+        xCoord = new_xCoord; //UPDATES THE X COORDINATE
+        yCoord = new_yCoord; //UPDATES THE Y COORDINATE
+        zCoord = new_zCoord; //UPDATES THE Z COORDINATE
+    }
+    
+    //CREATE POLYCYLINDER FOR PROGRAM
+    void drawCylinder(int x, int y, int z){
+        GLUquadricObj* newCircle = gluNewQuadric();
+        GLdouble circleHeight = 1; //DEFINES HEIGHT AT 1
+        glPushMatrix(); //SAVE CYLINDER
+        GLfloat WHITE[] = {1,1,1}; //DEFINES COLOR WHITE
+        glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, WHITE); //MATERIAL FOR CYLINDER
+        glTranslated(x, y, z); //MOVE CYLINDER TO POINT
+        glRotatef(theta,0,1,0); //ROTATE BY THETA
+        gluCylinder(newCircle, 1.0, circleHeight, 10, 30, 30);
+        glPopMatrix(); //POP CYLINDER
+        return;
+    }
+    
+    //FUNCTION TO UPDATE THE DIRECTION OF THE TURTLE (CW)
+    void update_theta(const float newTheta){
+        theta = newTheta; //UPDATES CW DIRECTION
+    }
+    
+    void update_thetaZ(const float newThetaZ){
+        thetaZ = newThetaZ; //UPDATES CCW DIRECTION
+    }
+    
+    void drawOn(){ //IF THE TURTLE IS DRAWING
+        draw = true;
+    }
+    
+    void drawOff(){ //IF THE TURTLE IS NOT DRAWING
+        draw = false;
+    }
+    
+    void moveForward(const float len){
+        //CHANGES POSITION FROM COORDINATE PLUS THE SPECIFIED LENGTH
+        float updatedX = xCoord + len; // * cos(PI*theta/180) + len*cos(PI*thetaZ/180);
+        float updatedY = yCoord + len; //*sin(PI*theta/180) + len*cos(PI*thetaZ/180);
+        float updatedZ = zCoord + len; //* sin(PI * thetaZ/180);
+        if (draw){
+            glBegin(GL_LINES);
+              glVertex3f(xCoord + setX, yCoord,zCoord + setY);
+              glVertex3f(updatedX + setX, updatedY,updatedZ + setY);
+            glEnd();
+            
+            drawCylinder((xCoord + updatedX/2)+setX, (yCoord + updatedY/2),(zCoord + updatedZ/2) + setY);
+        }
+        //UPDATES THE TURTLES POSITION IN THE X,Y, AND Z COORDINATES
+        xCoord = updatedX;
+        yCoord = updatedY;
+        zCoord = updatedZ;
+    }
+    
+    void turnLeft(const float angle){
+        theta += angle; //TURNS HEAD OF TURTLE TO THE LEFT
+    }
+    
+    void turnRight(const float angle){
+        theta -= angle; //TURNS HEAD OF THE TURTLE TO THE RIGHT
+    }
+    
+    void savePos(){
+        glPushMatrix();
+    }
+    
+    void visitOldPos(){
+        glPushMatrix();
+    }
+    
+    double getDrawInfo(){
+        return draw; //RETURNS A TRUE OR FALSE TO INFORM US IF TURTLE IS DRAWING OR NOT
+    }
+
+    float currentX(){
+        return xCoord; //RETURNS THE CURRENT X COORDINATE OF THE TURTLE
+    }
+    
+    float currentY(){
+        return yCoord; //RETURNS THE CURRENT Y COORDINATE OF THE TURTLE
+    }
+    
+    float currentZ(){
+        return zCoord; //RETURNS THE CURRENT Z COORDINATE OF THE TURTLE
+    }
+    
+    float currentTheta(){
+        return theta; //RETURNS THE CURRENT DIRECTION (CW) OF THE TURTLE
+    }
+};
+
+#endif /* turtle_h */
