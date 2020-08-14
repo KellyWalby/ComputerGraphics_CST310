@@ -1,0 +1,135 @@
+/*
+Project 9: Advanced Shaders 1
+Kelly Walby
+CST-310
+April 13, 2020
+*/
+
+//LIBRARY INCLUDES
+#include <GL/glut.h> 
+#include <cmath> 
+
+//OTHER INCLUDES
+#include "camera.h"
+#include "ball.h"
+#include "cube.h"
+#include "checkerboard.h"
+#include "cylinder.h"
+
+//COLORS FOR SHAPES
+GLfloat BLUE[] = {0, 0, 1}; //RGB: 0, 0, 255
+GLfloat PURPLE[] = {1, 0, 1}; //RGB: 255, 0, 255
+GLfloat RED[] = {1, 0, 0}; //RGB: 255, 0, 0
+
+// GLOBAL VARIABLES: A CHECKERBOARD, A CAMERA, A BALL, A CUBE, AND A CYLINDER
+Checkerboard checkerboard(8, 8); //CREATES A 8 X 8 CHECKERBOARD
+Camera camera; //CREATES A CAMERA
+
+//CREATES A BLUE BALL W/ CONSTRUCTOR OF BALL(RADIUS,COLOR,Y,X,Z)
+Ball ball[] = {
+  Ball(0.8, BLUE, 0.8, 4.5, 5)
+};
+
+//CREATES A RED CUBE W/ CONSTRUCTOR OF CUBE(DIAMETER,COLOR,Y,X,Z)
+Cube cube[] = {
+  Cube(1, RED, 0.53, 4.5, 1.4)
+};
+
+//CREATES A PURPLE CYLINDER W/ CONSTRUCTOR OF CYLINDER(RADIUS,COLOR,Y,X,Z)
+Cylinder cylinder[] = {
+  Cylinder(0.5,PURPLE, 0.1, 5, 2.7)
+};
+
+//APPLICATION-SPECIFIC INITIALIZATION: SET UP GLOBAL LIGHTING PARAMETERS AND CREATE DISPLAYS LISTS
+void init() {
+  glEnable(GL_DEPTH_TEST); //ENABLE DEPTH COMPARISONS AND UPDATE THE DEPTH BUFFER
+  glLightfv(GL_LIGHT0, GL_DIFFUSE, WHITE); //SPECIFY THE DIFFUSE RGB INTENSITY OF THE LIGHT
+  glLightfv(GL_LIGHT0, GL_SPECULAR, WHITE); //SPECIFY THE SPECULAR RGB INTENSITY OF THE LIGHT
+  glMaterialfv(GL_FRONT, GL_SPECULAR, WHITE); //SPECIFY THE DIFFUSE RGB INTENSITY OF THE FRONT
+  glMaterialf(GL_FRONT, GL_SHININESS, 30); //MATERIAL SHININESS OF THE FRONT
+  glEnable(GL_LIGHTING); //ENABLE LIGHTING
+  glEnable(GL_LIGHT0); //ENABLE LIGHT0
+  checkerboard.create(); //CREATES CHECKERBOARD
+}
+
+//DRAWS ONE FRAME, CHECKERBOARD, A BALL, A CUBE, AND A CYLINDER FROM CURRENT CAMERA POSITION
+void display() {
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glLoadIdentity();
+  gluLookAt(camera.getX(), camera.getY(), camera.getZ(), checkerboard.centerx(), 0.0, checkerboard.centerz(), 0.0, 1.0, 0.0);  //INITIALIZES CAMERA WHICH REFERS TO CAMERA.H AND CHECKERBOARD.H
+  checkerboard.draw(); //DRAWS CHECKERBOARD
+  //CREATES AND SETS OF THE BALL
+  for (int i = 0; i < sizeof ball / sizeof(Ball); i++) {
+    ball[i].update();
+  }
+  //CREATES AND SETS OF THE CUBE
+  for (int i = 0; i < sizeof cube / sizeof(Cube); i++) {
+    cube[i].update();
+  }
+
+  //CREATES AND SETS OF THE CYLINDER
+  for (int i = 0; i < sizeof cylinder / sizeof(Cylinder); i++) {
+    cylinder[i].update();
+  }
+  glFlush();
+  glutSwapBuffers();
+}
+
+//RESHAPE CONSTRUCTS A CAMERA THAT PERFECTLY FITS THE WINDOW
+void reshape(GLint w, GLint h) {
+  glViewport(0, 0, w, h);
+  glMatrixMode(GL_PROJECTION); 
+  glLoadIdentity();
+  gluPerspective(40.0, GLfloat(w) / GLfloat(h), 1.0, 150.0);
+  glMatrixMode(GL_MODELVIEW);
+}
+
+//REQUESTS TO DRAW THE NEXT FRAME
+void timer(int v) {
+  glutPostRedisplay();
+  glutTimerFunc(1000/60, timer, v);
+}
+
+//MOVES THE CAMERA ACCORDING TO THE KEY PRESSED AND THEN REFRESHES THE DISPLAY
+void special(int key, int, int) {
+  switch (key) 
+{
+    //LEFT KEY MOVES CAMERA LEFT
+    case GLUT_KEY_LEFT:
+      camera.moveLeft(); //REFERS TO MOVELEFT FUNCTION FROM CAMERA CLASS 
+      break;
+  
+    //RIGHT KEY MOVES CAMERA RIGHT
+    case GLUT_KEY_RIGHT: 
+      camera.moveRight(); //REFERS TO MOVERIGHT FUNCTION FROM CAMERA CLASS 
+      break;
+
+    //UP KEY MOVES CAMERA UP
+    case GLUT_KEY_UP: 
+      camera.moveUp(); //REFERS TO MOVEUP FUNCTION FROM CAMERA CLASS 
+      break;
+
+    //DOWN KEY MOVES CAMERA DOWN
+    case GLUT_KEY_DOWN:
+      camera.moveDown(); //REFERS TO MOVEDOWN FUNCTION FROM CAMERA CLASS 
+      break;
+  glutPostRedisplay();
+}
+}
+
+
+
+//INITIALIZES GLUT AND ENTERS MAIN LOOP 
+int main(int argc, char** argv) {
+  glutInit(&argc, argv);
+  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);  //DISPLAY MODE FOR DOUBLE, COLOR AND 3D DEPTH
+  glutInitWindowPosition(80, 80); //WINDOW POSITION
+  glutInitWindowSize(800, 600); //WINDOW SIZE
+  glutCreateWindow("KWALBY: PROJECT 9"); //CREATE AND NAME OF WINDOW
+  glutDisplayFunc(display); //DISPLAY FUNCTION
+  glutReshapeFunc(reshape); //RESHAPE FUNCTION
+  glutSpecialFunc(special); //SPECIAL FUNCTION FOR CAMERA MOVEMENTS
+  glutTimerFunc(100, timer, 0); //TIMER FUNCTION
+  init(); //INIT FUNCTION
+  glutMainLoop();
+}
